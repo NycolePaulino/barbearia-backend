@@ -35,8 +35,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/barbershops/**").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/api/bookings").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/bookings/**").authenticated()
+                        // Protege todos os métodos do /api/bookings (GET, POST, PATCH)
+                        .requestMatchers("/api/bookings/**").authenticated()
+
+                        // Protege o endpoint de horários livres
+                        .requestMatchers(HttpMethod.GET, "/api/barbershops/**/available-times").authenticated()
 
                         .anyRequest().authenticated()
                 )

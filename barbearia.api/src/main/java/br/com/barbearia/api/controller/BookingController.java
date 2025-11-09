@@ -5,8 +5,8 @@ import br.com.barbearia.api.domain.BarbershopService;
 import br.com.barbearia.api.domain.Booking;
 import br.com.barbearia.api.domain.User;
 import br.com.barbearia.api.dto.BookingRequest;
-import br.com.barbearia.api.dto.BookingResponse; // 1. IMPORTAR O NOVO DTO
-import br.com.barbearia.api.repository.BarbershopRepository; // 2. IMPORTAR O REPO DA BARBEARIA
+import br.com.barbearia.api.dto.BookingResponse;
+import br.com.barbearia.api.repository.BarbershopRepository;
 import br.com.barbearia.api.repository.BarbershopServiceRepository;
 import br.com.barbearia.api.repository.BookingRepository;
 import br.com.barbearia.api.repository.UserRepository;
@@ -23,7 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors; // 3. IMPORTAR O COLLECTORS
+import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import java.time.Instant;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -33,48 +36,35 @@ public class BookingController {
     private final BookingRepository bookingRepository;
     private final BarbershopServiceRepository serviceRepository;
     private final UserRepository userRepository;
-    private final BarbershopRepository barbershopRepository; // 4. INJECTAR O REPO DA BARBEARIA
+    private final BarbershopRepository barbershopRepository;
 
-    // === MÉTODO ATUALIZADO PARA DEVOLVER O "OBJETO RICO" ===
+    // Endpoint p/ meus agendamentos
     @GetMapping("/my-bookings")
     public ResponseEntity<?> getMyBookings(@AuthenticationPrincipal UserDetails userDetails) {
 
-        // Validação (igual)
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado.");
         }
+        // verifica se o user está no banco de dados
         Optional<User> userOpt = userRepository.findByEmail(userDetails.getUsername());
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não encontrado.");
         }
         User user = userOpt.get();
 
-        // 1. Busca os agendamentos normais (com IDs)
         List<Booking> bookings = bookingRepository.findByUserId(user.getId());
-
-        // 2. "Transforma" a lista de Booking em uma lista de BookingResponse
         List<BookingResponse> richBookings = bookings.stream().map(booking -> {
-            // Para cada agendamento, busca os detalhes
             BarbershopService service = serviceRepository.findById(booking.getServiceId()).orElse(null);
             Barbershop barbershop = (service != null)
                     ? barbershopRepository.findById(service.getBarbershopId()).orElse(null)
                     : null;
-
-            // 3. Monta o DTO de Resposta
-            return new BookingResponse(
-                    booking.getId(),
-                    booking.getDate(),
-                    booking.getCancelled(),
-                    service,
-                    barbershop
-            );
+            return new BookingResponse(booking.getId(), booking.getDate(), booking.getCancelled(), service, barbershop);
         }).collect(Collectors.toList());
 
-        // 4. Devolve a lista "rica"
         return ResponseEntity.ok(richBookings);
     }
 
-
+    // Endpoint para criar agendamentos
     @PostMapping
     public ResponseEntity<?> createBooking(@RequestBody BookingRequest request,
                                            @AuthenticationPrincipal UserDetails userDetails) {
@@ -82,7 +72,6 @@ public class BookingController {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado.");
         }
-
         Optional<User> userOpt = userRepository.findByEmail(userDetails.getUsername());
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não encontrado.");
@@ -99,23 +88,57 @@ public class BookingController {
                 service.getBarbershopId(),
                 request.getDate()
         );
-
         if (existingBooking.isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Já existe um agendamento para esta data.");
         }
 
-        Booking newBooking = new Booking(
-                null,
-                request.getServiceId(),
-                service.getBarbershopId(),
-                user.getId(),
-                request.getDate(),
-                false,
-                null
-        );
-
+        Booking newBooking = new Booking(null, request.getServiceId(), service.getBarbershopId(), user.getId(), request.getDate(), false, null);
         bookingRepository.save(newBooking);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(newBooking);
+    }
+
+    // Endpoint p/ cancelamento de reserva
+    @PatchMapping("/{bookingId}/cancel")
+    public ResponseEntity<?> cancelBooking(
+            @PathVariable String bookingId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        // verifica se o user está logado
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado.");
+        }
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não encontrado.");
+        }
+
+        // encontra a reserva
+        Booking booking = bookingRepository.findById(bookingId).orElse(null);
+        if (booking == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Reserva não encontrada.");
+        }
+
+        // verifica se o user é o dono da reserva
+        if (!booking.getUserId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Você não tem permissão para cancelar esta reserva.");
+        }
+
+        // verifica se já está cancelada
+        if (booking.getCancelled() != null && booking.getCancelled()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esta reserva já foi cancelada.");
+        }
+
+        // não pode cancelar reservas passadas
+        if (booking.getDate().isBefore(Instant.now())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Não é possível cancelar reservas passadas.");
+        }
+
+        // atualizando a reserva
+        booking.setCancelled(true);
+        booking.setCancelledAt(Instant.now());
+        bookingRepository.save(booking);
+
+        return ResponseEntity.ok(booking);
     }
 }

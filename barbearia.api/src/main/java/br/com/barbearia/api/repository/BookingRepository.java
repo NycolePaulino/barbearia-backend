@@ -13,6 +13,7 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
 
     Optional<Booking> findByBarbershopIdAndDate(String barbershopId, Instant date);
 
-    // método p/ enconstrar todos os bookings p/ esse userId
     List<Booking> findByUserId(String userId);
+
+    List<Booking> findByBarbershopIdAndDateBetween(String barbershopId, Instant start, Instant end);
 }
