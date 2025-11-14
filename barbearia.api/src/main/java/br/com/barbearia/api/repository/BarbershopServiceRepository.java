@@ -11,4 +11,5 @@ public interface BarbershopServiceRepository extends MongoRepository<BarbershopS
 
     // método p/ encontrar todos os serviços q tenham o barbershopId
     List<BarbershopService> findByBarbershopId(String barbershopId);
+    List<BarbershopService> findByNameContainingIgnoreCase(String name);
 }

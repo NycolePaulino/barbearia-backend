@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b570aa07-a9cc-4b56-97dd-c89fc08f5476" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/barbearia.api/src/main/java/br/com/barbearia/api/security/JwtTokenProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/barbearia.api/src/main/java/br/com/barbearia/api/security/JwtTokenProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/barbearia.api/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/barbearia.api/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,7 +93,10 @@
       <workItem from="1762694805317" duration="1941000" />
       <workItem from="1762697297984" duration="171000" />
       <workItem from="1762697944014" duration="7744000" />
-      <workItem from="1762801986409" duration="3238000" />
+      <workItem from="1762801986409" duration="7979000" />
+      <workItem from="1762906797746" duration="4161000" />
+      <workItem from="1762998884129" duration="51000" />
+      <workItem from="1763073339788" duration="5159000" />
     </task>
     <servers />
   </component>

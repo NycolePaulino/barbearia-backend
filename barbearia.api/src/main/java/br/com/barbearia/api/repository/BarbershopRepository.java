@@ -14,4 +14,7 @@ public interface BarbershopRepository extends MongoRepository<Barbershop, String
 
     // método p/ aba "populares"
     List<Barbershop> findAllByOrderByNameDesc();
+
+    //encontrando todas as barbearias cujo o Ids estejam nessa lista
+    List<Barbershop> findByIdIn(List<String> ids);
 }

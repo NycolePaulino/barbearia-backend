@@ -25,4 +25,6 @@ public class Booking {
     private Instant date;
     private Boolean cancelled;
     private Instant cancelledAt;
+
+    private String stripeChargeId;
 }

@@ -28,17 +28,21 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(withDefaults())
+
                 .csrf(csrf -> csrf.disable())
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.POST, "/api/webhooks/stripe").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/barbershops/search").permitAll()
+
                         .requestMatchers(HttpMethod.GET, "/api/barbershops/**").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
 
-                        // Protege todos os métodos do /api/bookings (GET, POST, PATCH)
+                        .requestMatchers(HttpMethod.POST, "/api/checkout/create-session").authenticated()
                         .requestMatchers("/api/bookings/**").authenticated()
-
-                        // Protege o endpoint de horários livres
                         .requestMatchers(HttpMethod.GET, "/api/barbershops/**/available-times").authenticated()
 
                         .anyRequest().authenticated()

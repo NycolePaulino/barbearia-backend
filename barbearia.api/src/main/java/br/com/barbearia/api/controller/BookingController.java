@@ -64,39 +64,6 @@ public class BookingController {
         return ResponseEntity.ok(richBookings);
     }
 
-    // Endpoint para criar agendamentos
-    @PostMapping
-    public ResponseEntity<?> createBooking(@RequestBody BookingRequest request,
-                                           @AuthenticationPrincipal UserDetails userDetails) {
-
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado.");
-        }
-        Optional<User> userOpt = userRepository.findByEmail(userDetails.getUsername());
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não encontrado.");
-        }
-        User user = userOpt.get();
-
-        Optional<BarbershopService> serviceOpt = serviceRepository.findById(request.getServiceId());
-        if (serviceOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Serviço não encontrado.");
-        }
-        BarbershopService service = serviceOpt.get();
-
-        Optional<Booking> existingBooking = bookingRepository.findByBarbershopIdAndDate(
-                service.getBarbershopId(),
-                request.getDate()
-        );
-        if (existingBooking.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Já existe um agendamento para esta data.");
-        }
-
-        Booking newBooking = new Booking(null, request.getServiceId(), service.getBarbershopId(), user.getId(), request.getDate(), false, null);
-        bookingRepository.save(newBooking);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newBooking);
-    }
-
     // Endpoint p/ cancelamento de reserva
     @PatchMapping("/{bookingId}/cancel")
     public ResponseEntity<?> cancelBooking(

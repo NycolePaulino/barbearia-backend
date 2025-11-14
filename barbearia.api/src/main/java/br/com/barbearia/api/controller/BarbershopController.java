@@ -21,7 +21,9 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import br.com.barbearia.api.dto.ServiceSearchResponse;
 
 @RestController
 @RequestMapping("/api/barbershops")
@@ -30,7 +32,7 @@ public class BarbershopController {
 
     private final BarbershopRepository barbershopRepository;
     private final BarbershopServiceRepository barbershopServiceRepository;
-    private final BookingRepository bookingRepository; // 7. INJETAR O BOOKING REPO
+    private final BookingRepository bookingRepository;
 
     // lista de horários
     private static final List<String> TIME_SLOTS = List.of(
@@ -90,5 +92,26 @@ public class BarbershopController {
         List<BarbershopService> services = barbershopServiceRepository.findByBarbershopId(id);
         barbershop.setServices(services);
         return ResponseEntity.ok(barbershop);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ServiceSearchResponse>> searchServices(
+            @RequestParam("q") String searchTerm) {
+
+        // encontra os serviços buscados
+        List<BarbershopService> matchingServices = barbershopServiceRepository.findByNameContainingIgnoreCase(searchTerm);
+
+        List<ServiceSearchResponse> response = matchingServices.stream().map(service -> {
+            // p/ cada serviço, busca sua barbearia
+            Barbershop barbershop = barbershopRepository.findById(service.getBarbershopId())
+                    .orElse(null);
+            return new ServiceSearchResponse(service, barbershop);
+
+        }).collect(Collectors.toList());
+
+        List<ServiceSearchResponse> finalResponse = response.stream()
+                .filter(res -> res.getBarbershop() != null)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(finalResponse);
     }
 }
