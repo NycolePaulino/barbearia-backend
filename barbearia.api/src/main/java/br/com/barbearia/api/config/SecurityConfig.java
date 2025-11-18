@@ -34,12 +34,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/api/webhooks/stripe").permitAll()
-
-                        .requestMatchers(HttpMethod.GET, "/api/barbershops/search").permitAll()
-
                         .requestMatchers(HttpMethod.GET, "/api/barbershops/**").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/checkout/success").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/checkout/create-session").authenticated()
                         .requestMatchers("/api/bookings/**").authenticated()
