@@ -6,10 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b570aa07-a9cc-4b56-97dd-c89fc08f5476" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/barbearia.api/src/main/java/br/com/barbearia/api/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/barbearia.api/src/main/java/br/com/barbearia/api/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/barbearia.api/src/main/java/br/com/barbearia/api/controller/CheckoutController.java" beforeDir="false" afterPath="$PROJECT_DIR$/barbearia.api/src/main/java/br/com/barbearia/api/controller/CheckoutController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/barbearia.api/src/main/java/br/com/barbearia/api/controller/StripeWebhookController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/barbearia.api/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/barbearia.api/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/barbearia.api/src/main/java/br/com/barbearia/api/config/DatabaseSeeder.java" beforeDir="false" afterPath="$PROJECT_DIR$/barbearia.api/src/main/java/br/com/barbearia/api/config/DatabaseSeeder.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,6 +99,8 @@
       <workItem from="1763073339788" duration="5159000" />
       <workItem from="1763460503537" duration="675000" />
       <workItem from="1763461976334" duration="1617000" />
+      <workItem from="1763466023140" duration="2072000" />
+      <workItem from="1763600366087" duration="2388000" />
     </task>
     <servers />
   </component>
